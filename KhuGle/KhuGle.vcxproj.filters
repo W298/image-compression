@@ -74,10 +74,19 @@
     <ClInclude Include="Huffman.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Export.h">
+    <ClInclude Include="Writer.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Decode.h">
+    <ClInclude Include="Decompress.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Compress.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Reader.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Colorspace.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

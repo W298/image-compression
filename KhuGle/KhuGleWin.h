@@ -50,7 +50,7 @@ public:
 	virtual void Update();
 	void OnPaint();
 
-	void DrawSceneTextPos(char *Text, CKgPoint ptPos);
+	void DrawSceneTextPos(char *Text, CKgPoint ptPos, COLORREF color = RGB(0, 0, 0), const char* font = "Arial", int weight = FW_NORMAL);
 	void ToggleFpsView();
 
 	CKhuGleWin(int nW, int nH);

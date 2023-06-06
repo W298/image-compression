@@ -1,14 +1,12 @@
 #pragma once
 
-#include "Huffman.h"
-#include "Export.h"
 #include "DWT.h"
+#include "Huffman.h"
+#include "Reader.h"
 
-using namespace std;
-
-void decode_image(double** OutY, double** OutCb, double** OutCr)
+inline void decompress_image(const char* read_path, double** OutY, double** OutCb, double** OutCr)
 {
-	const auto result = read_all();
+	const auto result = read_all(read_path);
 	const HeaderInfo info = std::get<0>(result);
 
 	int h = info.h;
@@ -18,29 +16,29 @@ void decode_image(double** OutY, double** OutCb, double** OutCr)
 	int h_qut = info.h / 4;
 	int w_qut = info.w / 4;
 
-	std::vector<std::string> map_name = { "LL1", "LH1", "HL1", "HH1", "LH", "HL", "HH" };
+	std::vector<std::string> map_name = {"LL1", "LH1", "HL1", "HH1", "LH", "HL", "HH"};
 	std::vector<std::pair<std::pair<int, int>, std::pair<int, int>>> map;
-	std::vector<double> factor = { 2, 8, 8, 32, 32, 128, 512 };
+	std::vector<double> factor = {2, 8, 8, 32, 32, 128, 512};
 
-	map.push_back({ {0, h_qut}, {0, w_qut} });
-	map.push_back({ {0, h_qut}, {w_qut, w_half} });
-	map.push_back({ {h_qut, h_half}, {0, w_qut} });
-	map.push_back({ {h_qut, h_half}, {w_qut, w_half} });
-	map.push_back({ {0, h_half}, {w_half, w} });
-	map.push_back({ {h_half, h}, {0, w_half} });
-	map.push_back({ {h_half, h}, {w_half, w} });
+	map.push_back({{0, h_qut}, {0, w_qut}});
+	map.push_back({{0, h_qut}, {w_qut, w_half}});
+	map.push_back({{h_qut, h_half}, {0, w_qut}});
+	map.push_back({{h_qut, h_half}, {w_qut, w_half}});
+	map.push_back({{0, h_half}, {w_half, w}});
+	map.push_back({{h_half, h}, {0, w_half}});
+	map.push_back({{h_half, h}, {w_half, w}});
 
-	string r_encoded_data_y = std::get<1>(result)[0];
-	string r_encoded_data_cb = std::get<1>(result)[1];
-	string r_encoded_data_cr = std::get<1>(result)[2];
+	std::string r_encoded_data_y = std::get<1>(result)[0];
+	std::string r_encoded_data_cb = std::get<1>(result)[1];
+	std::string r_encoded_data_cr = std::get<1>(result)[2];
 
 	r_encoded_data_y.erase(r_encoded_data_y.length() - info.y_pad, info.y_pad);
 	r_encoded_data_cb.erase(r_encoded_data_cb.length() - info.cb_pad, info.cb_pad);
 	r_encoded_data_cr.erase(r_encoded_data_cr.length() - info.cr_pad, info.cr_pad);
 
-	vector<pair<int, int>> r_rle_y = std::get<2>(result)[0];
-	vector<pair<int, int>> r_rle_cb = std::get<2>(result)[1];
-	vector<pair<int, int>> r_rle_cr = std::get<2>(result)[2];
+	std::vector<std::pair<int, int>> r_rle_y = std::get<2>(result)[0];
+	std::vector<std::pair<int, int>> r_rle_cb = std::get<2>(result)[1];
+	std::vector<std::pair<int, int>> r_rle_cr = std::get<2>(result)[2];
 
 	HuffmanNode* r_root_y = build_huffman_tree(r_rle_y);
 	HuffmanNode* r_root_cb = build_huffman_tree(r_rle_cb);

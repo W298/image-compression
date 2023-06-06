@@ -4,7 +4,6 @@
 #include <queue>
 #include <map>
 #include <string>
-#include <iostream>
 
 class HuffmanNode
 {
@@ -31,7 +30,7 @@ struct compare
 	}
 };
 
-std::vector<std::vector<int>> decode_with_huffman(std::string& encoded_str, HuffmanNode* root, int originalSize)
+inline std::vector<std::vector<int>> decode_with_huffman(std::string& encoded_str, HuffmanNode* root, int originalSize)
 {
 	std::vector<std::vector<int>> originalData(originalSize, std::vector<int>(originalSize));
 
@@ -55,7 +54,7 @@ std::vector<std::vector<int>> decode_with_huffman(std::string& encoded_str, Huff
 	return originalData;
 }
 
-void encode_loop(HuffmanNode* root, std::string str, std::map<int, std::string>& huffman_code)
+inline void encode_loop(HuffmanNode* root, std::string str, std::map<int, std::string>& huffman_code)
 {
 	if (root == nullptr) return;
 
@@ -68,7 +67,7 @@ void encode_loop(HuffmanNode* root, std::string str, std::map<int, std::string>&
 	encode_loop(root->right, str + "1", huffman_code);
 }
 
-std::string encode_with_huffman(HuffmanNode* root, std::vector<std::vector<int>>& data)
+inline std::string encode_with_huffman(HuffmanNode* root, std::vector<std::vector<int>>& data)
 {
 	std::map<int, std::string> huffman_code;
 	encode_loop(root, "", huffman_code);
@@ -85,7 +84,7 @@ std::string encode_with_huffman(HuffmanNode* root, std::vector<std::vector<int>>
 	return str;
 }
 
-HuffmanNode* build_huffman_tree(std::vector<std::pair<int, int>>& rle)
+inline HuffmanNode* build_huffman_tree(std::vector<std::pair<int, int>>& rle)
 {
 	std::priority_queue<HuffmanNode*, std::vector<HuffmanNode*>, compare> minHeap;
 
@@ -108,7 +107,7 @@ HuffmanNode* build_huffman_tree(std::vector<std::pair<int, int>>& rle)
 	return minHeap.top();
 }
 
-std::vector<std::pair<int, int>> run_length_encoding(std::vector<std::vector<int>>& data)
+inline std::vector<std::pair<int, int>> run_length_encoding(std::vector<std::vector<int>>& data)
 {
 	std::vector<std::pair<int, int>> rle;
 	for (int i = 0; i < data.size(); i++)

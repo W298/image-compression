@@ -338,7 +338,7 @@ void CKhuGleWin::OnPaint()
 	EndPaint(m_hWnd, &ps);
 }
 
-void CKhuGleWin::DrawSceneTextPos(char *Text, CKgPoint ptPos)
+void CKhuGleWin::DrawSceneTextPos(char *Text, CKgPoint ptPos, COLORREF color, const char* font, int weight)
 {
 	int nTextHeight = 25;
 
@@ -355,13 +355,13 @@ void CKhuGleWin::DrawSceneTextPos(char *Text, CKgPoint ptPos)
 	HFONT hFont;
 
 	hFont = CreateFontA(nTextHeight, 0, 0, 0, 
-		FW_NORMAL, 
+		weight,
 		0, 0, 0, ANSI_CHARSET, 0, 0, 0, FF_MODERN, 
-		"Arial");
+		font);
 
 	SelectObject(hCompDC, hFont);
 
-	SetTextColor(hCompDC, RGB(0, 0, 0));
+	SetTextColor(hCompDC, color);
 	SetBkMode(hCompDC, TRANSPARENT);
 
 	RECT Rt;

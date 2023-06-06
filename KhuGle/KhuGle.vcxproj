@@ -160,10 +160,13 @@
     <ClCompile Include="SoundPlayWin.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Decode.h" />
+    <ClInclude Include="Colorspace.h" />
+    <ClInclude Include="Compress.h" />
+    <ClInclude Include="Decompress.h" />
     <ClInclude Include="DWT.h" />
-    <ClInclude Include="Export.h" />
+    <ClInclude Include="Writer.h" />
     <ClInclude Include="Huffman.h" />
+    <ClInclude Include="Reader.h" />
     <ClInclude Include="KhuGleBase.h" />
     <ClInclude Include="KhuGleComponent.h" />
     <ClInclude Include="KhuGleLayer.h" />
