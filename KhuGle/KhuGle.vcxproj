@@ -164,6 +164,8 @@
     <ClInclude Include="Compress.h" />
     <ClInclude Include="Decompress.h" />
     <ClInclude Include="DWT.h" />
+    <ClInclude Include="FileManager.h" />
+    <ClInclude Include="Type.h" />
     <ClInclude Include="Writer.h" />
     <ClInclude Include="Huffman.h" />
     <ClInclude Include="Reader.h" />

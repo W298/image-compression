@@ -3,6 +3,7 @@
 //	Prof. Daeho Lee, nize@khu.ac.kr
 //
 #include "KhuGleWin.h"
+#include "FileManager.h"
 #include <cmath>
 #include <cstdio>
 #include <iostream>
@@ -64,13 +65,40 @@ LRESULT CALLBACK CKhuGleWin::WndProcInstanceMember(HWND hwnd, UINT message, WPAR
 	HBRUSH hBrushGray;
 	RECT rt;
 
-	hBrushGray = (HBRUSH)GetStockObject(GRAY_BRUSH); 
+	hBrushGray = CreateSolidBrush(RGB(210, 210, 210));
 
 	double AspectOrg, AspectWin;
 
 	switch (message)
 	{
-	case WM_CREATE: 
+	case WM_CREATE:
+		hMenu = CreateMenu();
+
+		hSubMenu = CreatePopupMenu();
+		AppendMenu(hSubMenu, MF_STRING, ID_FILE_LOAD_COMP, "&Load compressed image");
+		AppendMenu(hSubMenu, MF_STRING, ID_FILE_LOAD_BMP, "&Load BMP image");
+		AppendMenu(hMenu, MF_STRING | MF_POPUP, (UINT)hSubMenu, "&Load");
+
+		hSubMenu = CreatePopupMenu();
+		AppendMenu(hSubMenu, MF_STRING, ID_FILE_SAVE_COMP, "&Save as compressed image");
+		AppendMenu(hMenu, MF_STRING | MF_POPUP, (UINT)hSubMenu, "&Save");
+
+		SetMenu(hwnd, hMenu);
+		break;
+
+	case WM_COMMAND:
+		switch (LOWORD(wParam))
+		{
+		case ID_FILE_LOAD_COMP:
+			OnFileEvent(FileLoad(hwnd, "Compressed Image File\0*.comp"), LOWORD(wParam));
+			break;
+		case ID_FILE_LOAD_BMP:
+			OnFileEvent(FileLoad(hwnd, "BMP Image\0*.bmp"), LOWORD(wParam));
+			break;
+		case ID_FILE_SAVE_COMP:
+			OnFileEvent(FileSave(hwnd, "Compressed Image File\0*.comp"), LOWORD(wParam));	
+			break;
+		}
 		break;
 
 	case WM_PAINT:
@@ -338,9 +366,9 @@ void CKhuGleWin::OnPaint()
 	EndPaint(m_hWnd, &ps);
 }
 
-void CKhuGleWin::DrawSceneTextPos(char *Text, CKgPoint ptPos, COLORREF color, const char* font, int weight)
+void CKhuGleWin::DrawSceneTextPos(const char *Text, CKgPoint ptPos, COLORREF color, const char* font, int weight, int size)
 {
-	int nTextHeight = 25;
+	int nTextHeight = size;
 
 	HDC hDC;
 	HDC hCompDC;
@@ -478,7 +506,7 @@ int APIENTRY WinMain(HINSTANCE hInstance,
 	AdjustWindowRectEx(&windowRect, dwStyle, FALSE, dwExStyle);
 
 	CKhuGleWin::m_pWinApplication->m_hWnd = CreateWindowEx(NULL, "WinClass", 
-		"Ai and Data via Game", 
+		"Image Compression", 
 		dwStyle |
 		WS_CLIPCHILDREN |
 		WS_CLIPSIBLINGS,

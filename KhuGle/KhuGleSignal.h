@@ -79,7 +79,7 @@ public:
 	void ReadWave(char *FileName);
 	bool SaveWave(char *FileName);
 
-	void ReadBmp(char *FileName);
+	void ReadBmp(const char *FileName);
 	bool SaveBmp(char *FileName);
 
 	void MakeSpectrogram();

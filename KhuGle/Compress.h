@@ -4,6 +4,7 @@
 #include "DWT.h"
 #include "Huffman.h"
 #include "Writer.h"
+#include "Type.h"
 
 #include <iostream>
 
@@ -100,7 +101,8 @@ inline std::map<int, double> compute_quantization_table(const std::map<int, int>
 	return q_table;
 }
 
-inline void compress_image(const char* write_path, double** InputY, double** InputCb, double** InputCr, int img_height, int img_width, std::vector<CKhuGleSignal>& out_image_vec)
+inline CompResult* compress_image(double** InputY, double** InputCb, double** InputCr, int img_height, int img_width,
+                                  std::vector<CKhuGleSignal>& out_image_vec)
 {
 	constexpr bool use_dynamic_table = false;
 
@@ -488,12 +490,5 @@ inline void compress_image(const char* write_path, double** InputY, double** Inp
 		y_pad, cb_pad, cr_pad
 	);
 
-	write_all(write_path, info,
-	          encoded_data_y,
-	          encoded_data_cb,
-	          encoded_data_cr,
-	          rle_y,
-	          rle_cb,
-	          rle_cr
-	);
+	return new CompResult{info, encoded_data_y, encoded_data_cb, encoded_data_cr, rle_y, rle_cb, rle_cr};
 }

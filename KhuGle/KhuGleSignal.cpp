@@ -131,7 +131,7 @@ bool CKhuGleSignal::SaveWave(char *FileName)
 	return true;
 } 
 
-void CKhuGleSignal::ReadBmp(char *FileName)
+void CKhuGleSignal::ReadBmp(const char *FileName)
 {
 	if(m_Red) free_cmatrix(m_Red, m_nH, m_nW);
 	if(m_Green) free_cmatrix(m_Green, m_nH, m_nW);

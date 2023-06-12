@@ -52,7 +52,7 @@ inline std::vector<std::pair<int, int>> read_rle_data(std::ifstream& stream, int
 	return rle;
 }
 
-inline std::tuple<HeaderInfo, std::vector<std::string>, std::vector<std::vector<std::pair<int, int>>>> read_all(const char* read_path)
+inline CompResult* read_all(const char* read_path)
 {
 	std::ifstream fin(read_path, std::ios::in | std::ios::binary);
 	if (!fin) return {};
@@ -69,8 +69,26 @@ inline std::tuple<HeaderInfo, std::vector<std::string>, std::vector<std::vector<
 
 	fin.close();
 
-	std::vector<std::string> str_vec = {encoded_data_y, encoded_data_cb, encoded_data_cr};
-	std::vector<std::vector<std::pair<int, int>>> rle_vec = {rle_y, rle_cb, rle_cr};
+	return new CompResult{ info, encoded_data_y, encoded_data_cb, encoded_data_cr, rle_y, rle_cb, rle_cr };
+}
 
-	return make_tuple(info, str_vec, rle_vec);
+inline int measure_file_size(const char* path)
+{
+	std::ifstream fin(path, std::ios::in | std::ios::binary);
+	if (!fin) return -1;
+
+	fin.seekg(0, std::ios::end);
+	const int file_size = fin.tellg();
+	fin.close();
+
+	return file_size;
+}
+
+inline int measure_file_size(CompResult* result)
+{
+	write_all("Temp.comp", result);
+	const int file_size = measure_file_size("Temp.comp");
+	unlink("Temp.comp");
+
+	return file_size;
 }

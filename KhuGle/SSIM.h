@@ -41,7 +41,7 @@ inline double covariance(std::vector<std::vector<unsigned char>>& block1,
 
 inline double ssim(std::vector<std::vector<unsigned char>>& block1, std::vector<std::vector<unsigned char>>& block2)
 {
-	double L = 255.0; // Image depth
+	double L = 255.0;
 	double K1 = 0.01, K2 = 0.03;
 	double C1 = (K1 * L) * (K1 * L), C2 = (K2 * L) * (K2 * L);
 

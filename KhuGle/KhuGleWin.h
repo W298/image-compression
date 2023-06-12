@@ -4,12 +4,18 @@
 //
 #pragma once
 
+#include <string>
 #include <windows.h>
 #include "KhuGleBase.h"
 #include "KhuGleSprite.h"
 #include "KhuGleLayer.h"
 #include "KhuGleScene.h"
 #include "KhuGleComponent.h"
+
+#define IDR_HMENU			101
+#define ID_FILE_LOAD_COMP	102
+#define ID_FILE_LOAD_BMP	103
+#define ID_FILE_SAVE_COMP	104
 
 void PlayWave(short int *Sound, int nSampleRate, int nLen);
 void StopWave();
@@ -39,6 +45,8 @@ public:
 	bool m_bMousePressed[3];
 	int m_MousePosX, m_MousePosY;
 
+	HMENU hMenu, hSubMenu;
+
 	WINDOWPLACEMENT m_wpPrev;
 
 	static LRESULT CALLBACK WndProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam);
@@ -50,8 +58,10 @@ public:
 	virtual void Update();
 	void OnPaint();
 
-	void DrawSceneTextPos(char *Text, CKgPoint ptPos, COLORREF color = RGB(0, 0, 0), const char* font = "Arial", int weight = FW_NORMAL);
+	void DrawSceneTextPos(const char *Text, CKgPoint ptPos, COLORREF color = RGB(0, 0, 0), const char* font = "Arial", int weight = FW_NORMAL, int size = 25);
 	void ToggleFpsView();
+
+	virtual void OnFileEvent(std::string path, int mode) = 0;
 
 	CKhuGleWin(int nW, int nH);
 	virtual ~CKhuGleWin();

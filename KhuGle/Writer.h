@@ -4,31 +4,7 @@
 #include <fstream>
 #include <string>
 #include <vector>
-
-struct HeaderInfo
-{
-	int y_len, cb_len, cr_len;
-	int rle_y_len, rle_cb_len, rle_cr_len;
-	int h, w;
-	int y_pad, cb_pad, cr_pad;
-
-	HeaderInfo(): y_len(0), cb_len(0),
-	              cr_len(0), rle_y_len(0),
-	              rle_cb_len(0),
-	              rle_cr_len(0), h(0), w(0), y_pad(0), cb_pad(0), cr_pad(0)
-	{
-	}
-
-	HeaderInfo(int y_len, int cb_len, int cr_len, int rle_y_len, int rle_cb_len, int rle_cr_len, int w, int h,
-	           int y_pad, int cb_pad, int cr_pad) : y_len(y_len),
-	                                                cb_len(cb_len),
-	                                                cr_len(cr_len), rle_y_len(rle_y_len),
-	                                                rle_cb_len(rle_cb_len),
-	                                                rle_cr_len(rle_cr_len), h(h), w(w), y_pad(y_pad), cb_pad(cb_pad),
-	                                                cr_pad(cr_pad)
-	{
-	}
-};
+#include "Type.h"
 
 inline void write_header(std::ofstream& stream, const HeaderInfo& info)
 {
@@ -63,14 +39,20 @@ inline void write_rle_data(std::ofstream& stream, const std::vector<std::pair<in
 	}
 }
 
-inline void write_all(const char* write_path, const HeaderInfo& info, const std::string& y_image_data, const std::string& cb_image_data,
-                      const std::string& cr_image_data,
-                      const std::vector<std::pair<int, int>>& y_rle_data,
-                      const std::vector<std::pair<int, int>>& cb_rle_data,
-                      const std::vector<std::pair<int, int>>& cr_rle_data)
+inline void write_all(const char* write_path, CompResult* result)
 {
 	std::ofstream fout(write_path, std::ios::out | std::ios::binary);
 	if (!fout) return;
+
+	const auto info = result->info;
+
+	const auto y_image_data = result->encoded_data_y;
+	const auto cb_image_data = result->encoded_data_cb;
+	const auto cr_image_data = result->encoded_data_cr;
+
+	const auto y_rle_data = result->rle_y;
+	const auto cb_rle_data = result->rle_cb;
+	const auto cr_rle_data = result->rle_cr;
 
 	write_header(fout, info);
 
