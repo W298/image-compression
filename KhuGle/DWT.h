@@ -4,7 +4,7 @@
 
 double* tempbank = 0;
 
-inline void fwt97(double* x, int n)
+inline void FWT97(double* x, int n)
 {
 	double a;
 	int i;
@@ -59,7 +59,7 @@ inline void fwt97(double* x, int n)
 	for (i = 0; i < n; i++) x[i] = tempbank[i];
 }
 
-inline void iwt97(double* x, int n)
+inline void IWT97(double* x, int n)
 {
 	double a;
 	int i;
@@ -116,12 +116,12 @@ inline void iwt97(double* x, int n)
 	tempbank = 0;
 }
 
-inline void fwt2D(double** img, int n)
+inline void FWT2D(double** img, int n)
 {
 	// row-wise transform
 	for (int i = 0; i < n; i++)
 	{
-		fwt97(img[i], n);
+		FWT97(img[i], n);
 	}
 	// column-wise transform
 	for (int i = 0; i < n; i++)
@@ -131,7 +131,7 @@ inline void fwt2D(double** img, int n)
 		{
 			col[j] = img[j][i];
 		}
-		fwt97(col, n);
+		FWT97(col, n);
 		for (int j = 0; j < n; j++)
 		{
 			img[j][i] = col[j];
@@ -140,7 +140,7 @@ inline void fwt2D(double** img, int n)
 	}
 }
 
-void iwt2D(double** img, int n)
+void IWT2D(double** img, int n)
 {
 	// column-wise transform
 	for (int i = 0; i < n; i++)
@@ -150,7 +150,7 @@ void iwt2D(double** img, int n)
 		{
 			col[j] = img[j][i];
 		}
-		iwt97(col, n);
+		IWT97(col, n);
 		for (int j = 0; j < n; j++)
 		{
 			img[j][i] = col[j];
@@ -160,6 +160,6 @@ void iwt2D(double** img, int n)
 	// row-wise transform
 	for (int i = 0; i < n; i++)
 	{
-		iwt97(img[i], n);
+		IWT97(img[i], n);
 	}
 }

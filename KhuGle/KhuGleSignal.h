@@ -79,8 +79,8 @@ public:
 	void ReadWave(char *FileName);
 	bool SaveWave(char *FileName);
 
-	void ReadBmp(const char *FileName);
-	bool SaveBmp(char *FileName);
+	void ReadBmp(const char *FileName, int* image_size);
+	bool SaveBmp(const char *FileName);
 
 	void MakeSpectrogram();
 };

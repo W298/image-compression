@@ -8,29 +8,29 @@
 class HuffmanNode
 {
 public:
-	int data;
-	unsigned freq;
-	HuffmanNode* left;
-	HuffmanNode* right;
+	int data_;
+	unsigned freq_;
+	HuffmanNode* left_;
+	HuffmanNode* right_;
 
 	HuffmanNode(int data, unsigned freq, HuffmanNode* left = nullptr, HuffmanNode* right = nullptr)
 	{
-		this->data = data;
-		this->freq = freq;
-		this->left = left;
-		this->right = right;
+		this->data_ = data;
+		this->freq_ = freq;
+		this->left_ = left;
+		this->right_ = right;
 	}
 };
 
-struct compare
+struct Compare
 {
-	bool operator()(HuffmanNode* l, HuffmanNode* r)
+	bool operator()(HuffmanNode* l, HuffmanNode* r) const
 	{
-		return (l->freq > r->freq);
+		return (l->freq_ > r->freq_);
 	}
 };
 
-inline std::vector<std::vector<int>> decode_with_huffman(std::string& encoded_str, HuffmanNode* root, int originalSize)
+inline std::vector<std::vector<int>> DecodeWithHuffman(std::string& encoded_str, HuffmanNode* root, int originalSize)
 {
 	std::vector<std::vector<int>> originalData(originalSize, std::vector<int>(originalSize));
 
@@ -39,13 +39,13 @@ inline std::vector<std::vector<int>> decode_with_huffman(std::string& encoded_st
 	for (int i = 0; i < encoded_str.size(); i++)
 	{
 		if (encoded_str[i] == '0')
-			curr = curr->left;
+			curr = curr->left_;
 		else
-			curr = curr->right;
+			curr = curr->right_;
 
-		if (!curr->left && !curr->right)
+		if (!curr->left_ && !curr->right_)
 		{
-			originalData[++index / originalSize][index % originalSize] = curr->data;
+			originalData[++index / originalSize][index % originalSize] = curr->data_;
 			curr = root;
 			continue;
 		}
@@ -54,23 +54,23 @@ inline std::vector<std::vector<int>> decode_with_huffman(std::string& encoded_st
 	return originalData;
 }
 
-inline void encode_loop(HuffmanNode* root, std::string str, std::map<int, std::string>& huffman_code)
+inline void EncodeLoop(HuffmanNode* root, std::string str, std::map<int, std::string>& huffman_code)
 {
 	if (root == nullptr) return;
 
-	if (!root->left && !root->right)
+	if (!root->left_ && !root->right_)
 	{
-		huffman_code[root->data] = str;
+		huffman_code[root->data_] = str;
 	}
 
-	encode_loop(root->left, str + "0", huffman_code);
-	encode_loop(root->right, str + "1", huffman_code);
+	EncodeLoop(root->left_, str + "0", huffman_code);
+	EncodeLoop(root->right_, str + "1", huffman_code);
 }
 
-inline std::string encode_with_huffman(HuffmanNode* root, std::vector<std::vector<int>>& data)
+inline std::string EncodeWithHuffman(HuffmanNode* root, std::vector<std::vector<int>>& data)
 {
 	std::map<int, std::string> huffman_code;
-	encode_loop(root, "", huffman_code);
+	EncodeLoop(root, "", huffman_code);
 
 	std::string str = "";
 	for (int i = 0; i < data.size(); i++)
@@ -84,9 +84,9 @@ inline std::string encode_with_huffman(HuffmanNode* root, std::vector<std::vecto
 	return str;
 }
 
-inline HuffmanNode* build_huffman_tree(std::vector<std::pair<int, int>>& rle)
+inline HuffmanNode* BuildHuffmanTree(std::vector<std::pair<int, int>>& rle)
 {
-	std::priority_queue<HuffmanNode*, std::vector<HuffmanNode*>, compare> minHeap;
+	std::priority_queue<HuffmanNode*, std::vector<HuffmanNode*>, Compare> minHeap;
 
 	for (auto& pair : rle)
 	{
@@ -100,14 +100,14 @@ inline HuffmanNode* build_huffman_tree(std::vector<std::pair<int, int>>& rle)
 		HuffmanNode* left = minHeap.top();
 		minHeap.pop();
 
-		int sum = left->freq + right->freq;
+		int sum = left->freq_ + right->freq_;
 		minHeap.push(new HuffmanNode('\0', sum, left, right));
 	}
 
 	return minHeap.top();
 }
 
-inline std::vector<std::pair<int, int>> run_length_encoding(std::vector<std::vector<int>>& data)
+inline std::vector<std::pair<int, int>> RunLengthEncoding(std::vector<std::vector<int>>& data)
 {
 	std::vector<std::pair<int, int>> rle;
 	for (int i = 0; i < data.size(); i++)

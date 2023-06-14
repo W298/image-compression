@@ -131,7 +131,7 @@ bool CKhuGleSignal::SaveWave(char *FileName)
 	return true;
 } 
 
-void CKhuGleSignal::ReadBmp(const char *FileName)
+void CKhuGleSignal::ReadBmp(const char *FileName, int* image_size)
 {
 	if(m_Red) free_cmatrix(m_Red, m_nH, m_nW);
 	if(m_Green) free_cmatrix(m_Green, m_nH, m_nW);
@@ -199,6 +199,9 @@ void CKhuGleSignal::ReadBmp(const char *FileName)
 
 	m_nW = bmiHeader.biWidth;
 	m_nH = bmiHeader.biHeight;
+
+	image_size[0] = m_nH;
+	image_size[1] = m_nW;
 
 	m_Red = cmatrix(m_nH, m_nW);
 	m_Green = cmatrix(m_nH, m_nW);
@@ -271,7 +274,7 @@ void CKhuGleSignal::ReadBmp(const char *FileName)
 	delete [] Image1D;
 }
 
-bool CKhuGleSignal::SaveBmp(char *FileName)
+bool CKhuGleSignal::SaveBmp(const char *FileName)
 {
 	if(m_Red == nullptr) return false;
 	if(m_Green == nullptr) return false;
@@ -291,8 +294,8 @@ bool CKhuGleSignal::SaveBmp(char *FileName)
 
 	unsigned long dwBitsSize;
 
-	unsigned short widthDW = (m_nW*3+3)/4*4;;
-	unsigned short size = widthDW*m_nH;
+	unsigned int widthDW = (m_nW * 3 + 3) / 4 * 4;
+	unsigned int size = widthDW * m_nH;
 	dwBitsSize = sizeof(BITMAPFILEHEADER_) + sizeof(BITMAPINFOHEADER_) + size;
 
 	BITMAPINFOHEADER_ bmiHeader;

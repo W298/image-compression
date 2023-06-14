@@ -6,7 +6,7 @@
 #include <vector>
 #include "Type.h"
 
-inline void write_header(std::ofstream& stream, const HeaderInfo& info)
+inline void WriteHeader(std::ofstream& stream, const HeaderInfo& info)
 {
 	stream.write(reinterpret_cast<const char*>(&info.y_len), sizeof(info.y_len));
 	stream.write(reinterpret_cast<const char*>(&info.cb_len), sizeof(info.cb_len));
@@ -19,9 +19,10 @@ inline void write_header(std::ofstream& stream, const HeaderInfo& info)
 	stream.write(reinterpret_cast<const char*>(&info.y_pad), sizeof(info.y_pad));
 	stream.write(reinterpret_cast<const char*>(&info.cb_pad), sizeof(info.cb_pad));
 	stream.write(reinterpret_cast<const char*>(&info.cr_pad), sizeof(info.cr_pad));
+	stream.write(reinterpret_cast<const char*>(&info.deep), sizeof(info.deep));
 }
 
-inline void write_image_data(std::ofstream& stream, const std::string& image_data)
+inline void WriteImgData(std::ofstream& stream, const std::string& image_data)
 {
 	for (int i = 0; i < image_data.length(); i += 8)
 	{
@@ -30,7 +31,7 @@ inline void write_image_data(std::ofstream& stream, const std::string& image_dat
 	}
 }
 
-inline void write_rle_data(std::ofstream& stream, const std::vector<std::pair<int, int>>& rle)
+inline void WriteRLEData(std::ofstream& stream, const std::vector<std::pair<int, int>>& rle)
 {
 	for (const auto& pair : rle)
 	{
@@ -39,30 +40,30 @@ inline void write_rle_data(std::ofstream& stream, const std::vector<std::pair<in
 	}
 }
 
-inline void write_all(const char* write_path, CompResult* result)
+inline void WriteAll(const char* write_path, CompResult* result)
 {
 	std::ofstream fout(write_path, std::ios::out | std::ios::binary);
 	if (!fout) return;
 
-	const auto info = result->info;
+	const auto info = result->info_;
 
-	const auto y_image_data = result->encoded_data_y;
-	const auto cb_image_data = result->encoded_data_cb;
-	const auto cr_image_data = result->encoded_data_cr;
+	const auto y_image_data = result->encoded_data_y_;
+	const auto cb_image_data = result->encoded_data_cb_;
+	const auto cr_image_data = result->encoded_data_cr_;
 
-	const auto y_rle_data = result->rle_y;
-	const auto cb_rle_data = result->rle_cb;
-	const auto cr_rle_data = result->rle_cr;
+	const auto y_rle_data = result->rle_y_;
+	const auto cb_rle_data = result->rle_cb_;
+	const auto cr_rle_data = result->rle_cr_;
 
-	write_header(fout, info);
+	WriteHeader(fout, info);
 
-	write_image_data(fout, y_image_data);
-	write_image_data(fout, cb_image_data);
-	write_image_data(fout, cr_image_data);
+	WriteImgData(fout, y_image_data);
+	WriteImgData(fout, cb_image_data);
+	WriteImgData(fout, cr_image_data);
 
-	write_rle_data(fout, y_rle_data);
-	write_rle_data(fout, cb_rle_data);
-	write_rle_data(fout, cr_rle_data);
+	WriteRLEData(fout, y_rle_data);
+	WriteRLEData(fout, cb_rle_data);
+	WriteRLEData(fout, cr_rle_data);
 
 	fout.close();
 }

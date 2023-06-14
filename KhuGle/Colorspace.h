@@ -2,7 +2,7 @@
 
 #include "KhuGleWin.h"
 
-void RGB2YCbCr(double** R, double** G, double** B, double** Y, double** Cb, double** Cr, int height, int width)
+inline void RGB2YCbCr(double** R, double** G, double** B, double** Y, double** Cb, double** Cr, int height, int width)
 {
 	for (int y = 0; y < height; y++)
 	{
@@ -22,7 +22,7 @@ void RGB2YCbCr(double** R, double** G, double** B, double** Y, double** Cb, doub
 	}
 }
 
-void YCbCr2RGB(double** Y, double** Cb, double** Cr, double** R, double** G, double** B, int height, int width)
+inline void YCbCr2RGB(double** Y, double** Cb, double** Cr, double** R, double** G, double** B, int height, int width)
 {
 	for (int y = 0; y < height; y++)
 	{

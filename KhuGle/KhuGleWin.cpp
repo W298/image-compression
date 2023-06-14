@@ -76,11 +76,13 @@ LRESULT CALLBACK CKhuGleWin::WndProcInstanceMember(HWND hwnd, UINT message, WPAR
 
 		hSubMenu = CreatePopupMenu();
 		AppendMenu(hSubMenu, MF_STRING, ID_FILE_LOAD_COMP, "&Load compressed image");
-		AppendMenu(hSubMenu, MF_STRING, ID_FILE_LOAD_BMP, "&Load BMP image");
+		AppendMenu(hSubMenu, MF_STRING, ID_FILE_LOAD_BMP, "&Load BMP image (Normal Compression Level)");
+		AppendMenu(hSubMenu, MF_STRING, ID_FILE_LOAD_BMP_H, "&Load BMP image (High Compression Level)");
 		AppendMenu(hMenu, MF_STRING | MF_POPUP, (UINT)hSubMenu, "&Load");
 
 		hSubMenu = CreatePopupMenu();
 		AppendMenu(hSubMenu, MF_STRING, ID_FILE_SAVE_COMP, "&Save as compressed image");
+		AppendMenu(hSubMenu, MF_STRING, ID_FILE_SAVE_BMP, "&Save as BMP image");
 		AppendMenu(hMenu, MF_STRING | MF_POPUP, (UINT)hSubMenu, "&Save");
 
 		SetMenu(hwnd, hMenu);
@@ -93,10 +95,14 @@ LRESULT CALLBACK CKhuGleWin::WndProcInstanceMember(HWND hwnd, UINT message, WPAR
 			OnFileEvent(FileLoad(hwnd, "Compressed Image File\0*.comp"), LOWORD(wParam));
 			break;
 		case ID_FILE_LOAD_BMP:
+		case ID_FILE_LOAD_BMP_H:
 			OnFileEvent(FileLoad(hwnd, "BMP Image\0*.bmp"), LOWORD(wParam));
 			break;
 		case ID_FILE_SAVE_COMP:
 			OnFileEvent(FileSave(hwnd, "Compressed Image File\0*.comp"), LOWORD(wParam));	
+			break;
+		case ID_FILE_SAVE_BMP:
+			OnFileEvent(FileSave(hwnd, "BMP Image\0*.bmp"), LOWORD(wParam));
 			break;
 		}
 		break;
