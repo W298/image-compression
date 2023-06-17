@@ -96,14 +96,14 @@ public:
 	void LoadComp(const char* read_path);
 	void SaveAsComp(const char* write_path) const;
 	void SaveAsBMP(const char* write_path) const;
-	void OnFileEvent(std::string path, int mode) override;
+	void OnFileEvent(std::string path, int mode);
 };
 
 CImageProcessing::CImageProcessing(int nW, int nH)
 	: CKhuGleWin(nW, nH)
 {
-	m_pScene = new CKhuGleScene(1580, 580, KG_COLOR_24_RGB(210, 210, 210));
-	m_pImageLayer = new CKhuGleImageLayer(1580, 580, KG_COLOR_24_RGB(210, 210, 210), CKgPoint(0, 30));
+	m_pScene = new CKhuGleScene(1580, 580, KG_COLOR_24_RGB(192, 192, 192));
+	m_pImageLayer = new CKhuGleImageLayer(1580, 580, KG_COLOR_24_RGB(192, 192, 192), CKgPoint(0, 30));
 
 	m_pImageLayer->DrawBackgroundImage();
 	m_pScene->AddChild(m_pImageLayer);
@@ -117,6 +117,17 @@ CImageProcessing::~CImageProcessing()
 void CImageProcessing::Update()
 {
 	m_pScene->Render();
+	
+	if (m_bKeyPressed['A'])
+	{
+		CleanUp();
+		LoadBMPAndCompress("../Run/couple.bmp");
+	}
+	else if (m_bKeyPressed['B'])
+	{
+		CleanUp();
+		LoadBMPAndCompress("../Run/cat.bmp");
+	}
 
 	if (m_CurrentMode == ID_FILE_LOAD_COMP)
 	{

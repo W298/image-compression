@@ -36,9 +36,6 @@
     <ClCompile Include="KhuGleBase.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="SoundPlayWin.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="KhuGleSignal.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>

@@ -3,7 +3,6 @@
 //	Prof. Daeho Lee, nize@khu.ac.kr
 //
 #include "KhuGleWin.h"
-#include "FileManager.h"
 #include <cmath>
 #include <cstdio>
 #include <iostream>
@@ -14,6 +13,8 @@
 #include <cstdlib>
 #include <crtdbg.h>
 
+#include "FileManager.h"
+
 #ifdef _DEBUG
 #ifndef DBG_NEW
 #define DBG_NEW new ( _NORMAL_BLOCK , __FILE__ , __LINE__ )
@@ -21,9 +22,9 @@
 #endif
 #endif  // _DEBUG
 
-CKhuGleWin *CKhuGleWin::m_pWinApplication = 0;
+CKhuGleWin* CKhuGleWin::m_pWinApplication = 0;
 
-void KhuGleWinInit(CKhuGleWin *pApplication)
+void KhuGleWinInit(CKhuGleWin* pApplication)
 {
 	CKhuGleWin::m_pWinApplication = pApplication;
 
@@ -40,16 +41,16 @@ CKhuGleWin::CKhuGleWin(int nW, int nH)
 	m_nH = nH;
 	m_bViewFps = false;
 
-	for(int i = 0 ; i < 256 ; ++i)
+	for (int i = 0; i < 256; ++i)
 		m_bKeyPressed[i] = false;
 
-	for(int i = 0 ; i < 3 ; ++i)
+	for (int i = 0; i < 3; ++i)
 		m_bMousePressed[i] = false;
 }
 
 CKhuGleWin::~CKhuGleWin()
 {
-	if(m_pScene)
+	if (m_pScene)
 		delete m_pScene;
 }
 
@@ -65,7 +66,7 @@ LRESULT CALLBACK CKhuGleWin::WndProcInstanceMember(HWND hwnd, UINT message, WPAR
 	HBRUSH hBrushGray;
 	RECT rt;
 
-	hBrushGray = CreateSolidBrush(RGB(210, 210, 210));
+	hBrushGray = (HBRUSH)GetStockObject(LTGRAY_BRUSH);
 
 	double AspectOrg, AspectWin;
 
@@ -96,7 +97,6 @@ LRESULT CALLBACK CKhuGleWin::WndProcInstanceMember(HWND hwnd, UINT message, WPAR
 			GetSystemMetrics(SM_CYSCREEN) / 2 - (clientRect.bottom - clientRect.top) / 2,
 			(clientRect.right - clientRect.left) * 1.2, (clientRect.bottom - clientRect.top) * 1.2, 0
 		);
-
 		break;
 
 	case WM_COMMAND:
@@ -111,7 +111,7 @@ LRESULT CALLBACK CKhuGleWin::WndProcInstanceMember(HWND hwnd, UINT message, WPAR
 			OnFileEvent(FileLoad(hwnd, "BMP Image\0*.bmp"), LOWORD(wParam));
 			break;
 		case ID_FILE_SAVE_COMP:
-			OnFileEvent(FileSave(hwnd, "Compressed Image File\0*.comp"), LOWORD(wParam));	
+			OnFileEvent(FileSave(hwnd, "Compressed Image File\0*.comp"), LOWORD(wParam));
 			break;
 		case ID_FILE_SAVE_BMP:
 			OnFileEvent(FileSave(hwnd, "BMP Image\0*.bmp"), LOWORD(wParam));
@@ -123,7 +123,7 @@ LRESULT CALLBACK CKhuGleWin::WndProcInstanceMember(HWND hwnd, UINT message, WPAR
 		OnPaint();
 		break;
 
-	case WM_CLOSE:  
+	case WM_CLOSE:
 		PostQuitMessage(0);
 		break;
 
@@ -131,65 +131,65 @@ LRESULT CALLBACK CKhuGleWin::WndProcInstanceMember(HWND hwnd, UINT message, WPAR
 		height = HIWORD(lParam);
 		width = LOWORD(lParam);
 
-		AspectOrg = (double)m_nW/(double)m_nH;
-		AspectWin = (double)width/(double)height;
+		AspectOrg = (double)m_nW / (double)m_nH;
+		AspectWin = (double)width / (double)height;
 
 		m_nDesOffsetX = 0;
 		m_nDesOffsetY = 0;
 		m_nViewW = width;
 		m_nViewH = height;
 
-		if(AspectWin > AspectOrg)
+		if (AspectWin > AspectOrg)
 		{
-			m_nDesOffsetX = (int)((AspectWin-AspectOrg)*height/2.);
-			m_nViewW = (int)(height*AspectOrg);
+			m_nDesOffsetX = (int)((AspectWin - AspectOrg) * height / 2.);
+			m_nViewW = (int)(height * AspectOrg);
 		}
 		else
 		{
-			m_nDesOffsetY = (int)((1./AspectWin-1./AspectOrg)*width/2.);
-			m_nViewH = (int)(width/AspectOrg); 
+			m_nDesOffsetY = (int)((1. / AspectWin - 1. / AspectOrg) * width / 2.);
+			m_nViewH = (int)(width / AspectOrg);
 		}
 		break;
 
 	case WM_LBUTTONDOWN:
-		m_MousePosX = (LOWORD(lParam)-m_nDesOffsetX)*m_nW/m_nViewW; 
-		m_MousePosY = (HIWORD(lParam)-m_nDesOffsetY)*m_nH/m_nViewH;
+		m_MousePosX = (LOWORD(lParam) - m_nDesOffsetX) * m_nW / m_nViewW;
+		m_MousePosY = (HIWORD(lParam) - m_nDesOffsetY) * m_nH / m_nViewH;
 		m_bMousePressed[0] = true;
 		break;
 
 	case WM_LBUTTONUP:
-		m_MousePosX = (LOWORD(lParam)-m_nDesOffsetX)*m_nW/m_nViewW; 
-		m_MousePosY = (HIWORD(lParam)-m_nDesOffsetY)*m_nH/m_nViewH;
+		m_MousePosX = (LOWORD(lParam) - m_nDesOffsetX) * m_nW / m_nViewW;
+		m_MousePosY = (HIWORD(lParam) - m_nDesOffsetY) * m_nH / m_nViewH;
 		m_bMousePressed[0] = false;
 		break;
 
 	case WM_MBUTTONDOWN:
-		m_MousePosX = (LOWORD(lParam)-m_nDesOffsetX)*m_nW/m_nViewW; 
-		m_MousePosY = (HIWORD(lParam)-m_nDesOffsetY)*m_nH/m_nViewH;
+		m_MousePosX = (LOWORD(lParam) - m_nDesOffsetX) * m_nW / m_nViewW;
+		m_MousePosY = (HIWORD(lParam) - m_nDesOffsetY) * m_nH / m_nViewH;
 		m_bMousePressed[1] = true;
 		break;
 
 	case WM_MBUTTONUP:
-		m_MousePosX = (LOWORD(lParam)-m_nDesOffsetX)*m_nW/m_nViewW; 
-		m_MousePosY = (HIWORD(lParam)-m_nDesOffsetY)*m_nH/m_nViewH;
+		m_MousePosX = (LOWORD(lParam) - m_nDesOffsetX) * m_nW / m_nViewW;
+		m_MousePosY = (HIWORD(lParam) - m_nDesOffsetY) * m_nH / m_nViewH;
 		m_bMousePressed[1] = false;
 		break;
 
 	case WM_RBUTTONDOWN:
-		m_MousePosX = (LOWORD(lParam)-m_nDesOffsetX)*m_nW/m_nViewW; 
-		m_MousePosY = (HIWORD(lParam)-m_nDesOffsetY)*m_nH/m_nViewH;
+		m_MousePosX = (LOWORD(lParam) - m_nDesOffsetX) * m_nW / m_nViewW;
+		m_MousePosY = (HIWORD(lParam) - m_nDesOffsetY) * m_nH / m_nViewH;
 		m_bMousePressed[2] = true;
 		break;
 
 	case WM_RBUTTONUP:
-		m_MousePosX = (LOWORD(lParam)-m_nDesOffsetX)*m_nW/m_nViewW; 
-		m_MousePosY = (HIWORD(lParam)-m_nDesOffsetY)*m_nH/m_nViewH;
+		m_MousePosX = (LOWORD(lParam) - m_nDesOffsetX) * m_nW / m_nViewW;
+		m_MousePosY = (HIWORD(lParam) - m_nDesOffsetY) * m_nH / m_nViewH;
 		m_bMousePressed[2] = false;
 		break;
 
 	case WM_MOUSEMOVE:
-		m_MousePosX = (LOWORD(lParam)-m_nDesOffsetX)*m_nW/m_nViewW; 
-		m_MousePosY = (HIWORD(lParam)-m_nDesOffsetY)*m_nH/m_nViewH;
+		m_MousePosX = (LOWORD(lParam) - m_nDesOffsetX) * m_nW / m_nViewW;
+		m_MousePosY = (HIWORD(lParam) - m_nDesOffsetY) * m_nH / m_nViewH;
 		break;
 
 	case WM_KEYDOWN:
@@ -208,18 +208,18 @@ LRESULT CALLBACK CKhuGleWin::WndProcInstanceMember(HWND hwnd, UINT message, WPAR
 
 		case VK_RIGHT:
 			break;
-		}	
-		if(wParam >= 0 && wParam < 256)
+		}
+		if (wParam >= 0 && wParam < 256)
 			m_bKeyPressed[wParam] = true;
 		break;
 
 	case WM_KEYUP:
-		if(wParam >= 0 && wParam < 256)
+		if (wParam >= 0 && wParam < 256)
 			m_bKeyPressed[wParam] = false;
 		break;
 
 	case WM_CHAR:
-		switch (wParam) 
+		switch (wParam)
 		{
 		case 'a':
 			break;
@@ -227,12 +227,12 @@ LRESULT CALLBACK CKhuGleWin::WndProcInstanceMember(HWND hwnd, UINT message, WPAR
 		break;
 
 	case WM_ERASEBKGND:
-		hdc = (HDC) wParam; 
-		GetClientRect(hwnd, &rt); 
-		SetMapMode(hdc, MM_ANISOTROPIC); 
-		SetWindowExtEx(hdc, 100, 100, NULL); 
-		SetViewportExtEx(hdc, rt.right, rt.bottom, NULL); 
-		FillRect(hdc, &rt, hBrushGray); 
+		hdc = (HDC)wParam;
+		GetClientRect(hwnd, &rt);
+		SetMapMode(hdc, MM_ANISOTROPIC);
+		SetWindowExtEx(hdc, 100, 100, NULL);
+		SetViewportExtEx(hdc, rt.right, rt.bottom, NULL);
+		FillRect(hdc, &rt, hBrushGray);
 
 		break;
 
@@ -246,12 +246,12 @@ LRESULT CALLBACK CKhuGleWin::WndProcInstanceMember(HWND hwnd, UINT message, WPAR
 void CKhuGleWin::Fullscreen()
 {
 	DWORD dwStyle = GetWindowLong(m_hWnd, GWL_STYLE);
-	if(dwStyle & WS_OVERLAPPEDWINDOW) 
+	if (dwStyle & WS_OVERLAPPEDWINDOW)
 	{
 		m_wpPrev.length = sizeof(WINDOWPLACEMENT);
-		MONITORINFO mi = {sizeof(MONITORINFO)};
+		MONITORINFO mi = { sizeof(MONITORINFO) };
 		if (GetWindowPlacement(m_hWnd, &m_wpPrev) &&
-			GetMonitorInfo(MonitorFromWindow(m_hWnd, MONITOR_DEFAULTTOPRIMARY), &mi)) 
+			GetMonitorInfo(MonitorFromWindow(m_hWnd, MONITOR_DEFAULTTOPRIMARY), &mi))
 		{
 			SetWindowLong(m_hWnd, GWL_STYLE,
 				dwStyle & ~WS_OVERLAPPEDWINDOW);
@@ -262,7 +262,7 @@ void CKhuGleWin::Fullscreen()
 				SWP_NOOWNERZORDER | SWP_FRAMECHANGED);
 		}
 	}
-	else 
+	else
 	{
 		SetWindowLong(m_hWnd, GWL_STYLE, dwStyle | WS_OVERLAPPEDWINDOW);
 		SetWindowPlacement(m_hWnd, &m_wpPrev);
@@ -275,9 +275,9 @@ void CKhuGleWin::Fullscreen()
 void CKhuGleWin::GetFps()
 {
 	QueryPerformanceCounter((LARGE_INTEGER*)&m_TimeCountEnd);
-	m_ElapsedTime = (double)(m_TimeCountEnd - m_TimeCountStart)/(double)m_TimeCountFreq; 
+	m_ElapsedTime = (double)(m_TimeCountEnd - m_TimeCountStart) / (double)m_TimeCountFreq;
 	m_TimeCountStart = m_TimeCountEnd;
-	m_Fps = 1./m_ElapsedTime;
+	m_Fps = 1. / m_ElapsedTime;
 }
 
 void CKhuGleWin::Update()
@@ -290,7 +290,7 @@ void CKhuGleWin::Update()
 	char strFps[200];
 
 	sprintf(strFps, "FPS: %7.3lf, Elapsed time: %lf", m_Fps, m_ElapsedTime);
-	if(m_bViewFps)
+	if (m_bViewFps)
 	{
 		std::cout << strFps << std::endl;
 	}
@@ -301,10 +301,10 @@ void CKhuGleWin::OnPaint()
 	RECT Rect;
 	GetClientRect(m_hWnd, &Rect);
 
-	int nW = Rect.right-Rect.left;
-	int nH = Rect.bottom-Rect.top;
+	int nW = Rect.right - Rect.left;
+	int nH = Rect.bottom - Rect.top;
 
-	if(nW <= 0 || nH <= 0)
+	if (nW <= 0 || nH <= 0)
 	{
 		return;
 	}
@@ -330,23 +330,23 @@ void CKhuGleWin::OnPaint()
 	bmiHeader.biPlanes = 1;
 	bmiHeader.biBitCount = 24;
 	bmiHeader.biCompression = BI_RGB;
-	bmiHeader.biSizeImage = (m_nW*3+3)/4*4  * m_nH;
+	bmiHeader.biSizeImage = (m_nW * 3 + 3) / 4 * 4 * m_nH;
 	bmiHeader.biXPelsPerMeter = 2000;
 	bmiHeader.biYPelsPerMeter = 2000;
 	bmiHeader.biClrUsed = 0;
 	bmiHeader.biClrImportant = 0;
 
-	unsigned char *Image2D24 = new unsigned char [bmiHeader.biSizeImage];
+	unsigned char* Image2D24 = new unsigned char[bmiHeader.biSizeImage];
 	int x, y, Offset;
 
-	for(y = 0 ; y < m_nH ; y++)
+	for (y = 0; y < m_nH; y++)
 	{
-		Offset = (m_nW*3+3)/4*4 * (m_nH-y-1);
-		for(x = 0 ; x < m_nW ; x++)
+		Offset = (m_nW * 3 + 3) / 4 * 4 * (m_nH - y - 1);
+		for (x = 0; x < m_nW; x++)
 		{
-			int Offset2 = Offset+x*3;
+			int Offset2 = Offset + x * 3;
 
-			if(x < 0 || x >= m_pScene->m_nW || y < 0 || y >= m_pScene->m_nH)
+			if (x < 0 || x >= m_pScene->m_nW || y < 0 || y >= m_pScene->m_nH)
 			{
 				Image2D24[Offset2++] = 0;
 				Image2D24[Offset2++] = 0;
@@ -364,9 +364,9 @@ void CKhuGleWin::OnPaint()
 	SetStretchBltMode(hCompDC, HALFTONE);
 
 	StretchDIBits(hDC,
-		m_nDesOffsetX, m_nDesOffsetY, 
+		m_nDesOffsetX, m_nDesOffsetY,
 		m_nViewW, m_nViewH,
-		0,0,
+		0, 0,
 		bmiHeader.biWidth,
 		bmiHeader.biHeight,
 		Image2D24,
@@ -374,7 +374,7 @@ void CKhuGleWin::OnPaint()
 		DIB_RGB_COLORS,
 		SRCCOPY);
 
-	delete [] Image2D24;
+	delete[] Image2D24;
 
 	DeleteObject(hBitmap);
 
@@ -384,9 +384,9 @@ void CKhuGleWin::OnPaint()
 	EndPaint(m_hWnd, &ps);
 }
 
-void CKhuGleWin::DrawSceneTextPos(const char *Text, CKgPoint ptPos, COLORREF color, const char* font, int weight, int size)
+void CKhuGleWin::DrawSceneTextPos(const char* Text, CKgPoint ptPos, COLORREF color, LPCSTR fontFamily, int fontWeight, int fontSize)
 {
-	int nTextHeight = size;
+	int nTextHeight = fontSize;
 
 	HDC hDC;
 	HDC hCompDC;
@@ -395,15 +395,15 @@ void CKhuGleWin::DrawSceneTextPos(const char *Text, CKgPoint ptPos, COLORREF col
 	hDC = GetDC(NULL);
 	hCompDC = CreateCompatibleDC(hDC);
 
-	hBitmap = CreateCompatibleBitmap(hDC, nTextHeight*strlen(Text), nTextHeight+10);
+	hBitmap = CreateCompatibleBitmap(hDC, nTextHeight * strlen(Text), nTextHeight + 10);
 	SelectObject(hCompDC, hBitmap);
 
 	HFONT hFont;
 
-	hFont = CreateFontA(nTextHeight, 0, 0, 0, 
-		weight,
-		0, 0, 0, ANSI_CHARSET, 0, 0, 0, FF_MODERN, 
-		font);
+	hFont = CreateFontA(nTextHeight, 0, 0, 0,
+		fontWeight,
+		0, 0, 0, ANSI_CHARSET, 0, 0, 0, FF_MODERN,
+		fontFamily);
 
 	SelectObject(hCompDC, hFont);
 
@@ -416,8 +416,8 @@ void CKhuGleWin::DrawSceneTextPos(const char *Text, CKgPoint ptPos, COLORREF col
 	DrawText(hCompDC, Text, strlen(Text), &Rt, DT_CALCRECT | DT_LEFT);
 
 	BITMAPINFO bi;
-	int nW = Rt.right-Rt.left+1;
-	int nH = Rt.bottom-Rt.top+1;
+	int nW = Rt.right - Rt.left + 1;
+	int nH = Rt.bottom - Rt.top + 1;
 
 	bi.bmiHeader.biSize = sizeof(bi.bmiHeader);
 	bi.bmiHeader.biWidth = nW;
@@ -425,21 +425,21 @@ void CKhuGleWin::DrawSceneTextPos(const char *Text, CKgPoint ptPos, COLORREF col
 	bi.bmiHeader.biPlanes = 1;
 	bi.bmiHeader.biBitCount = 24;
 	bi.bmiHeader.biCompression = BI_RGB;
-	bi.bmiHeader.biSizeImage = (nW*3+3)/4*4  * nH;
+	bi.bmiHeader.biSizeImage = (nW * 3 + 3) / 4 * 4 * nH;
 	bi.bmiHeader.biClrUsed = 0;
 	bi.bmiHeader.biClrImportant = 0;
 
-	unsigned char *Image = new unsigned char[bi.bmiHeader.biSizeImage];
+	unsigned char* Image = new unsigned char[bi.bmiHeader.biSizeImage];
 
-	for(int y = 0 ; y < nH ; y++)
-		for(int x = 0 ; x < nW ; x++)
+	for (int y = 0; y < nH; y++)
+		for (int x = 0; x < nW; x++)
 		{
-			if(x+ptPos.X >= m_pScene->m_nW || y+ptPos.Y >= m_pScene->m_nH) break;
+			if (x + ptPos.X >= m_pScene->m_nW || y + ptPos.Y >= m_pScene->m_nH) break;
 
-			int pos = (nW*3+3)/4*4*(nH-y-1) + x*3;
-			Image[pos+2] = m_pScene->m_ImageR[y+ptPos.Y][x+ptPos.X];
-			Image[pos+1] = m_pScene->m_ImageG[y+ptPos.Y][x+ptPos.X];
-			Image[pos] = m_pScene->m_ImageB[y+ptPos.Y][x+ptPos.X];
+			int pos = (nW * 3 + 3) / 4 * 4 * (nH - y - 1) + x * 3;
+			Image[pos + 2] = m_pScene->m_ImageR[y + ptPos.Y][x + ptPos.X];
+			Image[pos + 1] = m_pScene->m_ImageG[y + ptPos.Y][x + ptPos.X];
+			Image[pos] = m_pScene->m_ImageB[y + ptPos.Y][x + ptPos.X];
 		}
 
 	SetStretchBltMode(hCompDC, HALFTONE);
@@ -448,7 +448,7 @@ void CKhuGleWin::DrawSceneTextPos(const char *Text, CKgPoint ptPos, COLORREF col
 		0, 0,
 		bi.bmiHeader.biWidth,
 		bi.bmiHeader.biHeight,
-		0,0,
+		0, 0,
 		bi.bmiHeader.biWidth,
 		bi.bmiHeader.biHeight,
 		Image,
@@ -461,18 +461,18 @@ void CKhuGleWin::DrawSceneTextPos(const char *Text, CKgPoint ptPos, COLORREF col
 
 	GetDIBits(hCompDC, hBitmap, 0, nH, Image, &bi, DIB_RGB_COLORS);
 
-	for(int y = 0 ; y < nH ; y++)
-		for(int x = 0 ; x < nW ; x++)
+	for (int y = 0; y < nH; y++)
+		for (int x = 0; x < nW; x++)
 		{
-			if(x+ptPos.X >= m_pScene->m_nW || y+ptPos.Y >= m_pScene->m_nH) break;
+			if (x + ptPos.X >= m_pScene->m_nW || y + ptPos.Y >= m_pScene->m_nH) break;
 
-			int pos = (nW*3+3)/4*4*(nH-y-1) + x*3;
-			m_pScene->m_ImageR[y+ptPos.Y][x+ptPos.X] = Image[pos+2];
-			m_pScene->m_ImageG[y+ptPos.Y][x+ptPos.X] = Image[pos+1];
-			m_pScene->m_ImageB[y+ptPos.Y][x+ptPos.X] = Image[pos];
+			int pos = (nW * 3 + 3) / 4 * 4 * (nH - y - 1) + x * 3;
+			m_pScene->m_ImageR[y + ptPos.Y][x + ptPos.X] = Image[pos + 2];
+			m_pScene->m_ImageG[y + ptPos.Y][x + ptPos.X] = Image[pos + 1];
+			m_pScene->m_ImageB[y + ptPos.Y][x + ptPos.X] = Image[pos];
 		}
 
-	delete [] Image;
+	delete[] Image;
 
 	DeleteObject(hBitmap);
 	DeleteObject(hFont);
@@ -486,20 +486,20 @@ int APIENTRY WinMain(HINSTANCE hInstance,
 	LPSTR     lpCmdLine,
 	int       nCmdShow)
 {
-	if(!CKhuGleWin::m_pWinApplication) return -1;
+	if (!CKhuGleWin::m_pWinApplication) return -1;
 
-	WNDCLASSEX windowClass; 
-	MSG		msg;  
-	DWORD   dwExStyle;  
-	DWORD   dwStyle;    
+	WNDCLASSEX windowClass;
+	MSG		msg;
+	DWORD   dwExStyle;
+	DWORD   dwStyle;
 	RECT    windowRect;
 
 	int width = CKhuGleWin::m_pWinApplication->m_nW;
 	int height = CKhuGleWin::m_pWinApplication->m_nH;
 
-	windowRect.left = (long)0;             
-	windowRect.right = (long)width;  
-	windowRect.top = (long)0;        
+	windowRect.left = (long)0;
+	windowRect.right = (long)width;
+	windowRect.top = (long)0;
 	windowRect.bottom = (long)height;
 
 	windowClass.cbSize = sizeof(WNDCLASSEX);
@@ -517,24 +517,24 @@ int APIENTRY WinMain(HINSTANCE hInstance,
 
 	if (!RegisterClassEx(&windowClass))	return 0;
 
-	dwExStyle = WS_EX_APPWINDOW | WS_EX_WINDOWEDGE; 
+	dwExStyle = WS_EX_APPWINDOW | WS_EX_WINDOWEDGE;
 	dwStyle = WS_OVERLAPPEDWINDOW;
 
 
 	AdjustWindowRectEx(&windowRect, dwStyle, FALSE, dwExStyle);
 
-	CKhuGleWin::m_pWinApplication->m_hWnd = CreateWindowEx(NULL, "WinClass", 
-		"Image Compression", 
+	CKhuGleWin::m_pWinApplication->m_hWnd = CreateWindowEx(NULL, "WinClass",
+		"Ai and Data via Game",
 		dwStyle |
 		WS_CLIPCHILDREN |
 		WS_CLIPSIBLINGS,
-		0, 0,                  
+		0, 0,
 		windowRect.right - windowRect.left,
 		windowRect.bottom - windowRect.top,
 		NULL,
 		NULL,
 		hInstance,
-		NULL);    
+		NULL);
 
 	if (!CKhuGleWin::m_pWinApplication->m_hWnd)
 	{
@@ -542,16 +542,16 @@ int APIENTRY WinMain(HINSTANCE hInstance,
 	}
 
 	ShowWindow(CKhuGleWin::m_pWinApplication->m_hWnd, SW_SHOW);
-	UpdateWindow(CKhuGleWin::m_pWinApplication->m_hWnd);  
+	UpdateWindow(CKhuGleWin::m_pWinApplication->m_hWnd);
 
 	QueryPerformanceFrequency((LARGE_INTEGER*)&CKhuGleWin::m_pWinApplication->m_TimeCountFreq);
 	QueryPerformanceCounter((LARGE_INTEGER*)&CKhuGleWin::m_pWinApplication->m_TimeCountStart);
-	
-	while(1)
+
+	while (1)
 	{
-		if(PeekMessage(&msg, 0, 0, 0, PM_REMOVE))
+		if (PeekMessage(&msg, 0, 0, 0, PM_REMOVE))
 		{
-			if (msg.message == WM_QUIT) 
+			if (msg.message == WM_QUIT)
 				break;
 
 			TranslateMessage(&msg);

@@ -20,12 +20,12 @@
 #define ID_FILE_SAVE_COMP	106
 #define ID_FILE_SAVE_BMP	107
 
-void PlayWave(short int *Sound, int nSampleRate, int nLen);
+void PlayWave(short int* Sound, int nSampleRate, int nLen);
 void StopWave();
-void GetPlaybackPosotion(unsigned long *Rate);
+void GetPlaybackPosotion(unsigned long* Rate);
 
 class CKhuGleWin;
-void KhuGleWinInit(CKhuGleWin *pApplication);
+void KhuGleWinInit(CKhuGleWin* pApplication);
 
 class CKhuGleWin
 {
@@ -36,7 +36,7 @@ public:
 	CKgVector2D m_Gravity;
 	CKgVector2D m_AirResistance;
 
-	static CKhuGleWin *m_pWinApplication;
+	static CKhuGleWin* m_pWinApplication;
 
 	int m_nDesOffsetX, m_nDesOffsetY;
 	int m_nViewW, m_nViewH;
@@ -61,15 +61,14 @@ public:
 	virtual void Update();
 	void OnPaint();
 
-	void DrawSceneTextPos(const char *Text, CKgPoint ptPos, COLORREF color = RGB(0, 0, 0), const char* font = "Arial", int weight = FW_NORMAL, int size = 25);
+	void DrawSceneTextPos(const char* Text, CKgPoint ptPos, COLORREF color, LPCSTR fontFamily, int fontWeight = FW_NORMAL, int fontSize = 25);
 	void ToggleFpsView();
-
-	virtual void OnFileEvent(std::string path, int mode) = 0;
 
 	CKhuGleWin(int nW, int nH);
 	virtual ~CKhuGleWin();
+	virtual void OnFileEvent(std::string path, int mode) = 0;
 	bool m_bViewFps;
 
-	CKhuGleScene *m_pScene;
+	CKhuGleScene* m_pScene;
 };
 

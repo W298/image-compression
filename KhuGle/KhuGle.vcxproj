@@ -157,7 +157,6 @@
     <ClCompile Include="KhuGleSprite.cpp" />
     <ClCompile Include="KhuGleWin.cpp" />
     <ClCompile Include="Main.cpp" />
-    <ClCompile Include="SoundPlayWin.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Colorspace.h" />
