@@ -163,6 +163,7 @@
     <ClInclude Include="Colorspace.h" />
     <ClInclude Include="Compress.h" />
     <ClInclude Include="Decompress.h" />
+    <ClInclude Include="DownSample.h" />
     <ClInclude Include="DWT.h" />
     <ClInclude Include="FileManager.h" />
     <ClInclude Include="Type.h" />

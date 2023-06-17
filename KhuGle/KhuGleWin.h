@@ -16,8 +16,9 @@
 #define ID_FILE_LOAD_COMP	102
 #define ID_FILE_LOAD_BMP	103
 #define ID_FILE_LOAD_BMP_H	104
-#define ID_FILE_SAVE_COMP	105
-#define ID_FILE_SAVE_BMP	106
+#define ID_FILE_LOAD_BMP_E	105
+#define ID_FILE_SAVE_COMP	106
+#define ID_FILE_SAVE_BMP	107
 
 void PlayWave(short int *Sound, int nSampleRate, int nLen);
 void StopWave();

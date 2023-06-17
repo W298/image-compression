@@ -56,10 +56,10 @@ inline void DecompressImage(const CompResult* result, double** OutY, double** Ou
 	int index = 0;
 	for (auto sub_band : map)
 	{
-		double r = info.deep ? 9 : 8;
+		double r = info.lvl == 0 ? 8 : info.lvl == 1 ? 10 : 12;
 		double i = 2;
 		double c = 8;
-		double f = info.deep ? 230 : 23;
+		double f = info.lvl == 0 ? 23 : info.lvl == 1 ? 230 : 2300;
 
 		double tau = pow(2, r - c + i) * (1 + f / pow(2, 11));
 
@@ -100,9 +100,9 @@ inline void DecompressImage(const CompResult* result, double** OutY, double** Ou
 			for (int x = w_range.first; x < w_range.second; x++)
 			{
 				double mul = a * (x + y) + b;
-				step_size_2d[y][x] = step_size * (info.deep ? mul : 1);
+				step_size_2d[y][x] = step_size * (info.lvl >= 1 ? mul : 1);
 
-				OutY[y][x] = decoded_data_y[y][x] * (step_size * (info.deep ? mul : 1));
+				OutY[y][x] = decoded_data_y[y][x] * (step_size * (info.lvl >= 1 ? mul : 1));
 			}
 		}
 
@@ -117,8 +117,8 @@ inline void DecompressImage(const CompResult* result, double** OutY, double** Ou
 			{
 				double mul = a * (x + y) + b;
 
-				OutCb[y][x] = decoded_data_cb[y][x] * (step_size * (info.deep ? mul : 1));
-				OutCr[y][x] = decoded_data_cr[y][x] * (step_size * (info.deep ? mul : 1));
+				OutCb[y][x] = decoded_data_cb[y][x] * (step_size * (info.lvl >= 1 ? mul : 1));
+				OutCr[y][x] = decoded_data_cr[y][x] * (step_size * (info.lvl >= 1 ? mul : 1));
 			}
 		}
 
@@ -215,7 +215,7 @@ inline void DecompressImage(const CompResult* result, double** OutY, double** Ou
 				for (int x = w_range.first; x < w_range.second; x++)
 				{
 					double n = 0.0;
-					if (info.deep)
+					if (info.lvl >= 1)
 					{
 						n = (step_size_2d[y][x] - min_step_size_2d) / max_step_size_2d;
 					}
@@ -263,8 +263,8 @@ inline void DecompressImage(const CompResult* result, double** OutY, double** Ou
 		free_dmatrix(fwt_b, h, w);
 
 		char buffer[100];
-		sprintf(buffer, "Step Size (min, max) : %.3f, %.3f", info.deep ? min_step_size_2d : min_step_size,
-		        info.deep ? max_step_size_2d : max_step_size);
+		sprintf(buffer, "Step Size (min, max) : %.3f, %.3f", info.lvl >= 1 ? min_step_size_2d : min_step_size,
+		        info.lvl >= 1 ? max_step_size_2d : max_step_size);
 		str = std::string(buffer);
 
 		sprintf(buffer, "RLE Size (Y, Cb, Cr) : %d, %d, %d", r_rle_y.size(), r_rle_cb.size(), r_rle_cr.size());

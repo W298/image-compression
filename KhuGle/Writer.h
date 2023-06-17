@@ -19,7 +19,7 @@ inline void WriteHeader(std::ofstream& stream, const HeaderInfo& info)
 	stream.write(reinterpret_cast<const char*>(&info.y_pad), sizeof(info.y_pad));
 	stream.write(reinterpret_cast<const char*>(&info.cb_pad), sizeof(info.cb_pad));
 	stream.write(reinterpret_cast<const char*>(&info.cr_pad), sizeof(info.cr_pad));
-	stream.write(reinterpret_cast<const char*>(&info.deep), sizeof(info.deep));
+	stream.write(reinterpret_cast<const char*>(&info.lvl), sizeof(info.lvl));
 }
 
 inline void WriteImgData(std::ofstream& stream, const std::string& image_data)

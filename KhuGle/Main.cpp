@@ -9,6 +9,7 @@
 #include "Decompress.h"
 #include "SSIM.h"
 #include "Type.h"
+#include "DownSample.h"
 #include <iostream>
 
 #pragma warning(disable:4996)
@@ -55,15 +56,23 @@ void CKhuGleImageLayer::DrawBackgroundImage() const
 	{
 		if (image.m_Red && image.m_Green && image.m_Blue)
 		{
-			for (int y = 0; y < image.m_nH && y < m_nH; ++y)
+			unsigned char** r = DownSampleImage(image.m_Red, image.m_nH, image.m_nW, 256, 256);
+			unsigned char** g = DownSampleImage(image.m_Green, image.m_nH, image.m_nW, 256, 256);
+			unsigned char** b = DownSampleImage(image.m_Blue, image.m_nH, image.m_nW, 256, 256);
+
+			for (int y = 0; y < 256; ++y)
 			{
-				for (int x = 0; x < image.m_nW && x < m_nW; ++x)
+				for (int x = 0; x < 256; ++x)
 				{
-					m_ImageBgR[y + m_OffsetY][x + m_OffsetX * index + image.m_nW * (index - 1)] = image.m_Red[y][x];
-					m_ImageBgG[y + m_OffsetY][x + m_OffsetX * index + image.m_nW * (index - 1)] = image.m_Green[y][x];
-					m_ImageBgB[y + m_OffsetY][x + m_OffsetX * index + image.m_nW * (index - 1)] = image.m_Blue[y][x];
+					m_ImageBgR[y + m_OffsetY][x + m_OffsetX * index + 256 * (index - 1)] = r[y][x];
+					m_ImageBgG[y + m_OffsetY][x + m_OffsetX * index + 256 * (index - 1)] = g[y][x];
+					m_ImageBgB[y + m_OffsetY][x + m_OffsetX * index + 256 * (index - 1)] = b[y][x];
 				}
 			}
+
+			free_cmatrix(r, 256, 256);
+			free_cmatrix(g, 256, 256);
+			free_cmatrix(b, 256, 256);
 		}
 
 		index++;
@@ -76,13 +85,14 @@ public:
 	CKhuGleImageLayer* m_pImageLayer;
 	std::string m_HeaderStr, m_ValueStr;
 	std::string m_ResultStr, m_ResultStr2;
-	CompResult* m_TempResult = nullptr;
+	std::unique_ptr<CompResult> m_TempResult;
 	int m_CurrentMode = -1;
 
 	CImageProcessing(int nW, int nH);
+	~CImageProcessing() override;
 	void Update() override;
 	void CleanUp();
-	void LoadBMPAndCompress(const char* path, bool deep = false);
+	void LoadBMPAndCompress(const char* path, int lvl = 0);
 	void LoadComp(const char* read_path);
 	void SaveAsComp(const char* write_path) const;
 	void SaveAsBMP(const char* write_path) const;
@@ -97,6 +107,11 @@ CImageProcessing::CImageProcessing(int nW, int nH)
 
 	m_pImageLayer->DrawBackgroundImage();
 	m_pScene->AddChild(m_pImageLayer);
+}
+
+CImageProcessing::~CImageProcessing()
+{
+	CleanUp();
 }
 
 void CImageProcessing::Update()
@@ -116,12 +131,15 @@ void CImageProcessing::Update()
 		DrawSceneTextPos(m_HeaderStr.c_str(), CKgPoint(50, 480), RGB(0, 0, 0), "Cascadia Code");
 		DrawSceneTextPos(m_ValueStr.c_str(), CKgPoint(50, 510), RGB(0, 0, 0), "Cascadia Code", FW_BOLD, 30);
 	}
-	else if (m_CurrentMode == ID_FILE_LOAD_BMP || m_CurrentMode == ID_FILE_LOAD_BMP_H)
+	else if (m_CurrentMode == ID_FILE_LOAD_BMP || m_CurrentMode == ID_FILE_LOAD_BMP_H || m_CurrentMode ==
+		ID_FILE_LOAD_BMP_E)
 	{
 		DrawSceneTextPos(
 			m_CurrentMode == ID_FILE_LOAD_BMP
 				? "Compression process (Normal Compression Level)"
-				: "Compression process (High Compression Level)", CKgPoint(50, 25), RGB(0, 0, 0), "Cascadia Code",
+				: m_CurrentMode == ID_FILE_LOAD_BMP_H
+				? "Compression process (High Compression Level)"
+				: "Compression process (Extreme Compression Level)", CKgPoint(50, 25), RGB(0, 0, 0), "Cascadia Code",
 			FW_BOLD, 30);
 		DrawSceneTextPos("Original", CKgPoint(130, 350), RGB(0, 0, 0), "Cascadia Code");
 		DrawSceneTextPos("DWT (Forward)", CKgPoint(415, 350), RGB(0, 0, 0), "Cascadia Code");
@@ -140,16 +158,15 @@ void CImageProcessing::Update()
 
 void CImageProcessing::CleanUp()
 {
-	m_TempResult = nullptr;
+	m_TempResult.reset();
+
 	m_ResultStr = "";
 	m_ResultStr2 = "";
 	m_HeaderStr = "";
 	m_ValueStr = "";
-
-	delete m_TempResult;
 }
 
-void CImageProcessing::LoadBMPAndCompress(const char* path, bool deep)
+void CImageProcessing::LoadBMPAndCompress(const char* path, int lvl)
 {
 	int image_size[2];
 	m_pImageLayer->m_ImageVec[0].ReadBmp(path, image_size);
@@ -176,10 +193,8 @@ void CImageProcessing::LoadBMPAndCompress(const char* path, bool deep)
 	}
 
 	RGB2YCbCr(original_r, original_g, original_b, original_y, original_cb, original_cr, bmp_height, bmp_width);
-	CompResult* result = CompressImage(original_y, original_cb, original_cr, bmp_height, bmp_width, deep,
-	                                   m_pImageLayer->m_ImageVec, m_ResultStr, m_ResultStr2);
-
-	m_TempResult = result;
+	CompressImage(m_TempResult, original_y, original_cb, original_cr, bmp_height, bmp_width, lvl,
+	              m_pImageLayer->m_ImageVec, m_ResultStr, m_ResultStr2);
 
 	m_pImageLayer->m_ImageVec[4].m_Red = cmatrix(m_nH, m_nW);
 	m_pImageLayer->m_ImageVec[4].m_Green = cmatrix(m_nH, m_nW);
@@ -196,11 +211,11 @@ void CImageProcessing::LoadBMPAndCompress(const char* path, bool deep)
 	double** test_cb = dmatrix(bmp_height / 2, bmp_width / 2);
 	double** test_cr = dmatrix(bmp_height / 2, bmp_width / 2);
 
-	DecompressImage(result, test_y, test_cb, test_cr);
+	DecompressImage(m_TempResult.get(), test_y, test_cb, test_cr);
 	YCbCr2RGB(test_y, test_cb, test_cr, test_r, test_g, test_b, bmp_height, bmp_width);
 
 	const int original_file_size = MeasureFileSize(path);
-	const int file_size = MeasureFileSize(result);
+	const int file_size = MeasureFileSize(m_TempResult.get());
 
 	for (int y = 0; y < bmp_height; ++y)
 	{
@@ -315,7 +330,7 @@ void CImageProcessing::SaveAsComp(const char* write_path) const
 		return;
 	}
 
-	WriteAll(write_path, m_TempResult);
+	WriteAll(write_path, m_TempResult.get());
 }
 
 void CImageProcessing::SaveAsBMP(const char* write_path) const
@@ -348,7 +363,11 @@ void CImageProcessing::OnFileEvent(std::string path, int mode)
 		break;
 	case ID_FILE_LOAD_BMP_H:
 		CleanUp();
-		LoadBMPAndCompress(path.c_str(), true);
+		LoadBMPAndCompress(path.c_str(), 1);
+		break;
+	case ID_FILE_LOAD_BMP_E:
+		CleanUp();
+		LoadBMPAndCompress(path.c_str(), 2);
 		break;
 	case ID_FILE_SAVE_COMP:
 		SaveAsComp(path.c_str());

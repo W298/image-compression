@@ -17,7 +17,7 @@ inline HeaderInfo ReadHeader(std::ifstream& stream)
 	stream.read(reinterpret_cast<char*>(&info.y_pad), sizeof(info.y_pad));
 	stream.read(reinterpret_cast<char*>(&info.cb_pad), sizeof(info.cb_pad));
 	stream.read(reinterpret_cast<char*>(&info.cr_pad), sizeof(info.cr_pad));
-	stream.read(reinterpret_cast<char*>(&info.deep), sizeof(info.deep));
+	stream.read(reinterpret_cast<char*>(&info.lvl), sizeof(info.lvl));
 
 	return info;
 }

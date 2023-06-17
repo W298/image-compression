@@ -9,7 +9,7 @@
 #include <iostream>
 
 inline std::vector<int> Flatten(const std::vector<std::vector<int>>& origin, int h_start, int h_end, int w_start,
-                                int w_end)
+	int w_end)
 {
 	std::vector<int> merged_vector;
 	for (int i = h_start; i < h_end; i++)
@@ -48,7 +48,7 @@ inline std::map<double, int> ComputePreciseHistogram(const std::vector<double>& 
 }
 
 inline std::map<double, double> ComputePreciseQuantizationTable(const std::map<double, int>& precise_histogram,
-                                                                double base_step_size)
+	double base_step_size)
 {
 	std::map<double, double> q_table;
 
@@ -101,9 +101,9 @@ inline std::map<int, double> ComputeQuantizationTable(const std::map<int, int>& 
 	return q_table;
 }
 
-inline CompResult* CompressImage(double** InputY, double** InputCb, double** InputCr, int img_height, int img_width,
-                                 bool deep,
-                                 std::vector<CKhuGleSignal>& out_image_vec, std::string& str, std::string& str2)
+inline void CompressImage(std::unique_ptr<CompResult>& res, double** InputY, double** InputCb, double** InputCr, int img_height, int img_width,
+	int lvl,
+	std::vector<CKhuGleSignal>& out_image_vec, std::string& str, std::string& str2)
 {
 	FWT2D(InputY, img_height);
 	FWT2D(InputCb, img_height / 2);
@@ -147,17 +147,17 @@ inline CompResult* CompressImage(double** InputY, double** InputCb, double** Inp
 	int h_qut = img_height / 4;
 	int w_qut = img_width / 4;
 
-	std::vector<std::string> map_name = {"LL1", "LH1", "HL1", "HH1", "LH", "HL", "HH"};
+	std::vector<std::string> map_name = { "LL1", "LH1", "HL1", "HH1", "LH", "HL", "HH" };
 	std::vector<std::pair<std::pair<int, int>, std::pair<int, int>>> map;
-	std::vector<double> factor = {2, 8, 8, 32, 32, 128, 512};
+	std::vector<double> factor = { 2, 8, 8, 32, 32, 128, 512 };
 
-	map.push_back({{0, h_qut}, {0, w_qut}});
-	map.push_back({{0, h_qut}, {w_qut, w_half}});
-	map.push_back({{h_qut, h_half}, {0, w_qut}});
-	map.push_back({{h_qut, h_half}, {w_qut, w_half}});
-	map.push_back({{0, h_half}, {w_half, w}});
-	map.push_back({{h_half, h}, {0, w_half}});
-	map.push_back({{h_half, h}, {w_half, w}});
+	map.push_back({ {0, h_qut}, {0, w_qut} });
+	map.push_back({ {0, h_qut}, {w_qut, w_half} });
+	map.push_back({ {h_qut, h_half}, {0, w_qut} });
+	map.push_back({ {h_qut, h_half}, {w_qut, w_half} });
+	map.push_back({ {0, h_half}, {w_half, w} });
+	map.push_back({ {h_half, h}, {0, w_half} });
+	map.push_back({ {h_half, h}, {w_half, w} });
 
 	std::vector<double> step_size_vec;
 	double** step_size_2d = dmatrix(h, w);
@@ -169,10 +169,10 @@ inline CompResult* CompressImage(double** InputY, double** InputCb, double** Inp
 	int index = 0;
 	for (auto sub_band : map)
 	{
-		double r = deep ? 9 : 8;
+		double r = lvl == 0 ? 8 : lvl == 1 ? 10 : 12;
 		double i = 2;
 		double c = 8;
-		double f = deep ? 230 : 23;
+		double f = lvl == 0 ? 23 : lvl == 1 ? 230 : 2300;
 
 		double tau = pow(2, r - c + i) * (1 + f / pow(2, 11));
 
@@ -213,9 +213,9 @@ inline CompResult* CompressImage(double** InputY, double** InputCb, double** Inp
 			for (int x = w_range.first; x < w_range.second; x++)
 			{
 				double mul = a * (x + y) + b;
-				step_size_2d[y][x] = step_size * (deep ? mul : 1);
+				step_size_2d[y][x] = step_size * (lvl >= 1 ? mul : 1);
 
-				int q = (int)std::round(InputY[y][x] / (step_size * (deep ? mul : 1)));
+				int q = (int)std::round(InputY[y][x] / (step_size * (lvl >= 1 ? mul : 1)));
 				quantized_y[y][x] = q;
 			}
 		}
@@ -231,10 +231,10 @@ inline CompResult* CompressImage(double** InputY, double** InputCb, double** Inp
 			{
 				double mul = a * (x + y) + b;
 
-				int q = (int)std::round(InputCb[y][x] / (step_size * (deep ? mul : 1)));
+				int q = (int)std::round(InputCb[y][x] / (step_size * (lvl >= 1 ? mul : 1)));
 				quantized_cb[y][x] = q;
 
-				q = (int)std::round(InputCr[y][x] / (step_size * (deep ? mul : 1)));
+				q = (int)std::round(InputCr[y][x] / (step_size * (lvl >= 1 ? mul : 1)));
 				quantized_cr[y][x] = q;
 			}
 		}
@@ -267,7 +267,7 @@ inline CompResult* CompressImage(double** InputY, double** InputCb, double** Inp
 			for (int x = w_range.first; x < w_range.second; x++)
 			{
 				double n = 0.0;
-				if (deep)
+				if (lvl >= 1)
 				{
 					n = (step_size_2d[y][x] - min_step_size_2d) / max_step_size_2d;
 				}
@@ -292,8 +292,8 @@ inline CompResult* CompressImage(double** InputY, double** InputCb, double** Inp
 	std::vector<std::pair<int, int>> rle_cr = RunLengthEncoding(quantized_cr);
 
 	char buffer[100];
-	sprintf(buffer, "Step Size (min, max) : %.3f, %.3f", deep ? min_step_size_2d : min_step_size,
-	        deep ? max_step_size_2d : max_step_size);
+	sprintf(buffer, "Step Size (min, max) : %.3f, %.3f", lvl >= 1 ? min_step_size_2d : min_step_size,
+		lvl >= 1 ? max_step_size_2d : max_step_size);
 	str = std::string(buffer);
 
 	sprintf(buffer, "RLE Size (Y, Cb, Cr) : %d, %d, %d", rle_y.size(), rle_cb.size(), rle_cr.size());
@@ -399,10 +399,10 @@ inline CompResult* CompressImage(double** InputY, double** InputCb, double** Inp
 		rle_cr.size(),
 		img_height, img_width,
 		y_pad, cb_pad, cr_pad,
-		deep
+		lvl
 	);
 
 	delete step_size_2d;
 
-	return new CompResult{info, encoded_data_y, encoded_data_cb, encoded_data_cr, rle_y, rle_cb, rle_cr};
+	res = std::make_unique<CompResult>(info, encoded_data_y, encoded_data_cb, encoded_data_cr, rle_y, rle_cb, rle_cr);
 }

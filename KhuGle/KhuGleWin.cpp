@@ -78,6 +78,7 @@ LRESULT CALLBACK CKhuGleWin::WndProcInstanceMember(HWND hwnd, UINT message, WPAR
 		AppendMenu(hSubMenu, MF_STRING, ID_FILE_LOAD_COMP, "&Load compressed image");
 		AppendMenu(hSubMenu, MF_STRING, ID_FILE_LOAD_BMP, "&Load BMP image (Normal Compression Level)");
 		AppendMenu(hSubMenu, MF_STRING, ID_FILE_LOAD_BMP_H, "&Load BMP image (High Compression Level)");
+		AppendMenu(hSubMenu, MF_STRING, ID_FILE_LOAD_BMP_E, "&Load BMP image (Extreme Compression Level)");
 		AppendMenu(hMenu, MF_STRING | MF_POPUP, (UINT)hSubMenu, "&Load");
 
 		hSubMenu = CreatePopupMenu();
@@ -86,6 +87,16 @@ LRESULT CALLBACK CKhuGleWin::WndProcInstanceMember(HWND hwnd, UINT message, WPAR
 		AppendMenu(hMenu, MF_STRING | MF_POPUP, (UINT)hSubMenu, "&Save");
 
 		SetMenu(hwnd, hMenu);
+
+		RECT clientRect;
+		GetClientRect(hwnd, &clientRect);
+
+		SetWindowPos(hwnd, NULL,
+			GetSystemMetrics(SM_CXSCREEN) / 2 - (clientRect.right - clientRect.left) / 2,
+			GetSystemMetrics(SM_CYSCREEN) / 2 - (clientRect.bottom - clientRect.top) / 2,
+			(clientRect.right - clientRect.left) * 1.2, (clientRect.bottom - clientRect.top) * 1.2, 0
+		);
+
 		break;
 
 	case WM_COMMAND:
@@ -96,6 +107,7 @@ LRESULT CALLBACK CKhuGleWin::WndProcInstanceMember(HWND hwnd, UINT message, WPAR
 			break;
 		case ID_FILE_LOAD_BMP:
 		case ID_FILE_LOAD_BMP_H:
+		case ID_FILE_LOAD_BMP_E:
 			OnFileEvent(FileLoad(hwnd, "BMP Image\0*.bmp"), LOWORD(wParam));
 			break;
 		case ID_FILE_SAVE_COMP:
