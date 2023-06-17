@@ -13,3 +13,7 @@
 #### Extreme
 
 ![Extreme](Pictures/Extreme.png)
+
+### Compression Process
+
+![Process](Pictures/Process.png)
