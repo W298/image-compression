@@ -14,6 +14,6 @@
 
 ![Extreme](Pictures/Extreme.png)
 
-### Compression Process
+### Compression & Encoding / Decoding Process
 
 ![Process](Pictures/Process.png)
